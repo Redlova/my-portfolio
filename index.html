@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مساحتي الخاصة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- إعدادات المتغيرات والألوان --- */
+        :root {
+            --bg-color: #0e0e10; /* لون الليل الداكن */
+            --card-bg: rgba(30, 30, 35, 0.6); /* لون الزجاج الشفاف */
+            --accent-gold: #d4af37; /* الذهبي المعتق */
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Amiri', serif; /* خط عربي كلاسيكي */
+            line-height: 1.8;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a20 0%, #0e0e10 100%);
+        }
+
+        /* --- التصميم العام --- */
+        header {
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif; /* للعنوان الإنجليزي إن وجد */
+            font-size: 3rem;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            animation: fadeIn 2s ease-in;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* القائمة العلوية */
+        nav {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            background: rgba(14, 14, 16, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            border-radius: 50px;
+            width: fit-content;
+            margin: 0 auto 50px auto;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--accent-gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        /* --- الأقسام --- */
+        section {
+            max-width: 900px;
+            margin: 0 auto 80px auto;
+            padding: 20px;
+            opacity: 0; /* للإنميشن عند الظهور */
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--accent-gold);
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 10px;
+            display: inline-block;
+            width: 100%;
+        }
+
+        /* --- قسم الصور (معرض فني) --- */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .photo-card {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s;
+            height: 300px;
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(40%); /* تأثير فني */
+            transition: 0.5s;
+        }
+
+        .photo-card:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-gold);
+        }
+
+        .photo-card:hover img {
+            filter: grayscale(0%);
+        }
+
+        /* --- قسم القصائد (بطاقات شفافة) --- */
+        .poem-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            border-left: 3px solid var(--accent-gold);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .poem-card h3 {
+            color: var(--accent-gold);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .poem-text {
+            white-space: pre-line; /* للحفاظ على تنسيق الأبيات */
+            font-size: 1.2rem;
+        }
+
+        .poem-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .poem-content {
+            flex: 1;
+            max-height: 300px;
+            overflow: hidden;
+            position: relative;
+            transition: max-height 0.5s ease;
+        }
+
+        .poem-content.expanded {
+            max-height: none;
+        }
+
+        .poem-fade {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, var(--card-bg));
+            pointer-events: none;
+        }
+
+        .poem-content.expanded .poem-fade {
+            display: none;
+        }
+
+        .expand-btn {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            padding: 15px 8px;
+            background: var(--card-bg);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 5px;
+            color: var(--accent-gold);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            white-space: nowrap;
+            height: fit-content;
+        }
+
+        .expand-btn:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--accent-gold);
+        }
+
+        /* --- قسم الكتب (المكتبة) --- */
+        .book-shelf {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .book {
+            width: 180px;
+            text-align: center;
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 260px;
+            background: #2a2a30;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            display: flex; /* مؤقت لوضع نص توضيحي */
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #444;
+            color: #666;
+        }
+        
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 8px 20px;
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .download-btn:hover {
+            background: var(--accent-gold);
+            color: var(--bg-color);
+        }
+
+        /* --- تذييل --- */
+        footer {
+            text-align: center;
+            padding: 50px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 50px;
+        }
+
+        /* انيميشن */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#photos">بصريات</a>
+        <a href="#poetry">نصوص</a>
+        <a href="#library">مكتبتي</a>
+    </nav>
+
+    <header>
+        <h1>Redlová</h1>
+        <p class="subtitle">حيث يسكن الهدوء.. وتتحدث الحروف</p>
+    </header>
+
+    <section id="photos">
+        <h2 class="section-title">زوايا بصرية</h2>
+        <div class="gallery">
+            <div class="photo-card"><img src="image1.png" alt="صورة 1"></div>
+            <div class="photo-card"><img src="image2.png" alt="صورة 2"></div>
+            <div class="photo-card"><img src="image3.png" alt="صورة 3"></div>
+        </div>
+    </section>
+
+    <section id="poetry">
+        <h2 class="section-title">فيض المشاعر</h2>
+        
+        <div class="poem-card">
+            <h3>عنوان القصيدة الأولى</h3>
+            <div class="poem-text">
+                هنا تكتب أبياتك الشعرية..
+                سطر تلو الآخر..
+                بخط عربي أنيق يشبه المخطوطات القديمة.
+                
+                "دع الحروف تعانق الصمت.."
+            </div>
+        </div>
+
+        <div class="poem-card">
+            <h3>خاطرة مسائية</h3>
+            <div class="poem-text">
+                يمكنك كتابة نصوص طويلة هنا، الخواطر، أو الاقتباسات التي تعجبك.
+                التصميم يسمح للقراءة المريحة للعين.
+            </div>
+        </div>
+
+        <div class="poem-card">
+            <h3>جرع العيون</h3>
+            <div class="poem-text">
+                ترا العين في حكيها فاضح
+                تبوح بلي ما قدرت اقوله
+                
+                تعزف بصمتٍ لحنٍ جارح
+                وتخفي من أسرارها جزوله
+                
+                فاز قلباً في غلاك عاشق
+                وعن شوفته ما تصّبر يفوته
+                
+                يشوفك نبضاً في عروقه فاضح
+                وإذا غابت تذبل به فصوله
+            </div>
+        </div>
+
+        <div class="poem-card">
+            <h3>سيوف الوقت</h3>
+            <div class="poem-container">
+                <div class="poem-content">
+                    <div class="poem-text">يا كيف أوصف من يساوي ألوفه
+كنه بدر تمّ وسماه تغطيه
+
+إن غاب عن عيني زاد حسوفه
+وإن لاح طيفه زاد قلبي يغليه
+
+الوقت قاسي والتجارب تطوفه
+كلٍ يبي دنياه والرياح تجوفه
+
+جتني سيوف الوقت تسعى بحتوفه
+وضاقت بي الدنيا ولا عاد لي فيه شوفه
+
+يا وقت وش باقي تجرّه بسيوفه
+ما عاد فيني شي يقدر يطوفه
+
+يا عزتي لقلب تزايد نزوفه
+ما ظن يبرى لو تواست ظروفه
+
+منهو على الطيب والوفا لي كفوفه
+اللي لطلب روحه بروحي اعوفه
+
+يا جعل ربي عن عذابه يعوفه
+ما غير قلبٍ في غيابه يهوفه</div>
+                    <div class="poem-fade"></div>
+                </div>
+                <button class="expand-btn" onclick="togglePoem(this)">عرض المزيد</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="library">
+        <h2 class="section-title">رف الكتب</h2>
+        <div class="book-shelf">
+            
+            <div class="book">
+                <div class="book-cover">
+                    <span>غلاف الكتاب</span> 
+                </div>
+                <h4>اسم الكتاب الأول</h4>
+                <a href="#" class="download-btn">تحميل PDF</a>
+            </div>
+
+            <div class="book">
+                <div class="book-cover">
+                    <span>غلاف الكتاب</span>
+                </div>
+                <h4>ديوان شعري</h4>
+                <a href="#" class="download-btn">قراءة</a>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        2025 <span style="font-family: 'Amiri', serif; color: var(--accent-gold); font-size: 1.1rem;">Redlová</span>. All rights reserved &copy;
+    </footer>
+
+    <script>
+        // كود لإظهار الأقسام عند التمرير (Scroll Animation)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        });
+
+        document.querySelectorAll('section').forEach((section) => {
+            observer.observe(section);
+        });
+
+        // دالة لتبديل عرض القصيدة
+        function togglePoem(btn) {
+            const poemContent = btn.previousElementSibling;
+            poemContent.classList.toggle('expanded');
+            btn.textContent = poemContent.classList.contains('expanded') ? 'إخفاء' : 'عرض المزيد';
+        }
+    </script>
+
+</body>
+</html>
